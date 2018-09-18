@@ -1,0 +1,85 @@
+log_format  main  $time_local
+                  $remote_addr
+                  $http_host
+                  $http_x_forwarded_for
+                  $request_method
+                  $request_uri
+                  $server_protocol
+                  $status
+                  $body_bytes_sent
+                  $http_referer
+                  $http_user_agent
+                  $request_time |;
+
+ 18/Sep/2018:10:19:47 +0800|192.168.0.30|sit.crazysales.com.au|-|GET|/js/lib/jquery.menu-aim.js?v=qfCi9MNg|HTTP/1.1|304|0|
+https://sit.crazysales.com.au/sin|Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0|0.000|
+
+
+
+        grok {
+                match => { "message" => "%{HTTPDATE:timestamp}\|
+                                         %{IP:remote_addr}\|
+                                         %{IPORHOST:http_host}\|
+                                         (?:%{DATA:http_x_forwarded_for}|-)\|
+                                         %{DATA:request_method}\|
+                                         %{DATA:request_uri}\|
+                                         %{DATA:server_protocol}\|
+                                         %{NUMBER:status}\|
+                                         (?:%{NUMBER:body_bytes_sent}|-)\|
+                                         (?:%{DATA:http_referer}|-)\|
+                                         %{DATA:http_user_agent}\|(?:%{DATA:request_time}|-)\|"}
+        }
+
+
+
+log_format main  '$http_x_forwarded_for $remote_addr - $remote_user [$time_local]'
+#                      '[$host]'
+#                      '"$request_method $scheme://$host$request_uri $server_protocol" $status $body_bytes_sent'
+#                      '"$http_referer" "$http_user_agent" "$upstream_cache_status"'
+#                      ' "$request_time $upstream_response_time $upstream_addr"'
+#                      ' "$http_cdn_src_ip" "$http_true_client_ip"';
+
+
+- 192.168.0.100 - - [23/Nov/2016:15:23:06 +0800][sit.crazysales.com.au]"GET http://sit.crazysales.com.au/images/best_icon.jpg HTTP/1.1" 200 3222"http://sit.crazysales.com.au/"
+"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.52 Safari/537.36" "-" "0.000 - -" "-" "-"
+
+
+
+
+
+
+
+filter {
+    if "nginx-accesslog" in [tags] {
+        grok {
+                match => { "message" => "%{HTTPDATE:timestamp}\|%{IP:remote_addr}\|%{IPORHOST:http_host}\|(?:%{DATA:http_x_forwarded_for}|-)\|%{DATA:request_method}\|%{DATA:request_uri}\|%{DATA:server_protocol}\|%{NUMBER:status}\|(?:%{NUMBER:body_bytes_sent}|-)\|(?:%{DATA:http_referer}|-)\|%{DATA:http_user_agent}\|(?:%{DATA:request_time}|-)\|"}
+        }
+        mutate {
+                convert => ["status","integer"]
+                convert => ["body_bytes_sent","integer"]
+                convert => ["request_time","float"]
+        }
+        geoip {
+                source=>"remote_addr"
+        }
+        date {
+                match => [ "timestamp","dd/MMM/YYYY:HH:mm:ss Z"]
+        }
+        useragent {
+                source=>"http_user_agent"
+        }
+}
+    if "sys-messages"  in [tags] {
+        grok {
+                        match => { "message" => "%{SYSLOGLINE}" }
+                        add_field => [ "received_at", "%{@timestamp}" ]
+                        add_field => [ "received_from", "%{host}" ]
+        }
+        date {
+                match => [ "timestamp", "MMM  d HH:mm:ss" ]
+        }
+        #ruby {
+        #        code => "event['@timestamp'] = event['@timestamp'].getlocal"
+        #}
+}
+}
