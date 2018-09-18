@@ -1,0 +1,37 @@
+og_format  main        '$remote_addr |
+                        $time_local |
+                        $request |
+                        $uri | '
+                       '$status |
+                        $body_bytes_sent |
+                        $bytes_sent |
+                        $gzip_ratio |
+                        $http_referer | '
+                      '"$http_user_agent" |
+                        $http_x_forwarded_for |
+                        $upstream_addr |
+                        $upstream_response_time |
+                        $upstream_status |
+                        $request_time';
+
+
+
+grok {
+    match => [
+                    "message", "%{IPORHOST:clientip} \|
+                                %{HTTPDATE:timestamp} \|
+                                (?:%{WORD:verb}
+                                %{NOTSPACE:request}(?: HTTP/%{NUMBER:http_version})?|-) \|
+                                %{URIPATH:uripath} \|
+                                %{NUMBER:response} \|
+                                (?:%{NUMBER:body_bytes_sent}|-) \|
+                                (?:%{NUMBER:bytes_sent}|-) \|
+                                (?:%{NOTSPACE:gzip_ratio}|-) \|
+                                (?:%{QS:http_referer}|-) \|
+                                 %{QS:user_agent} \|
+                                (?:%{QS:http_x_forwarded_for}|-) \|
+                                (%{URIHOST:upstream_addr}|-) \|
+                                (%{BASE16FLOAT:upstream_response_time}) \|
+                                %{NUMBER:upstream_status} \|
+                                (%{BASE16FLOAT:request_time})"
+                ]
