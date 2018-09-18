@@ -1,4 +1,4 @@
-og_format  main        '$remote_addr |
+log_format  main       '$remote_addr |
                         $time_local |
                         $request |
                         $uri | '
