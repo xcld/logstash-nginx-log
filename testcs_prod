@@ -1,0 +1,110 @@
+log_format main  '$http_x_forwarded_for $remote_addr - $remote_user [$time_local]'
+                      '[$host]'
+                      '"$request_method $scheme://$host$request_uri $server_protocol" $status $body_bytes_sent'
+                      '"$http_referer" "$http_user_agent" "$upstream_cache_status"'
+                      ' "$request_time $upstream_response_time $upstream_addr"'
+                      ' "$http_cdn_src_ip" "$http_true_client_ip" "$PHPSESSID" ';
+
+
+
+
+
+203.176.155.6 203.176.155.6 - - [19/Sep/2018:12:42:50 +1000][www.crazysales.com.au]"GET https://www.crazysales.com.au/js-minified/newhomepage/app/jquery.js?v=qfCi9MNp HTTP/1.1" 200 34709"https://www.crazysales.com.au/online-stanley-rogers-2-piece-pistol-grip-carving-set-18-0-stainless-steel-38077.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36" "-" "0.000 - -" "-" "-" "acagabekp3q12ufei4gucp2bve"
+
+
+                  203.176.155.6
+                  203.176.155.6 -
+                  - [19/Sep/2018:12:42:50 +1000]
+                  [www.crazysales.com.au]
+                  "GET https://www.crazysales.com.au/js-minified/newhomepage/app/jquery.js?v=qfCi9MNp HTTP/1.1" 200 34709"https://www.crazysales.com.au/online-stanley-rogers-2-piece-pistol-grip-carving-set-18-0-stainless-steel-38077.html" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36" "-" "0.000 - -" "-" "-" "acagabekp3q12ufei4gucp2bve"
+
+log_format main  '$http_x_forwarded_for
+                  $remote_addr -
+                  $remote_user [$time_local]'
+                '[$host]'
+                '"$request_method
+                  $scheme://$host$request_uri
+                  $server_protocol"
+                  $status $body_bytes_sent'
+                '"$http_referer"
+                 "$http_user_agent"
+                 "$upstream_cache_status"'
+               ' "$request_time
+                  $upstream_response_time
+                  $upstream_addr"'
+                ' "$http_cdn_src_ip"
+                  "$http_true_client_ip"
+                  "$PHPSESSID" ';
+
+
+
+               (?:%{QS:http_x_forwarded_for}|-) \|
+               %{IP:remote_addr}\|
+               \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]
+                \[%{IPORHOST:host}\]\|
+               \"%{DATA:request_method}\|
+               (?:%{DATA:http_referer}|-)\|
+                %{DATA:server_protocol}\"\|
+                %{NUMBER:status}\|
+                (?:%{NUMBER:body_bytes_sent}|-)\|
+                \"(?:%{DATA:http_referer}|-)\"\|
+                 \"%{DATA:http_user_agent}\"\|
+                 \"(?:%{NUMBER:upstream_cache_status}|-)\"\|
+                 \"(?:%{DATA:request_time}|-)\|
+                 (%{BASE16FLOAT:upstream_response_time}) \|
+                 (?:%{IP:upstream_addr}|-)\"\|
+                  \"(?:%{IP:http_cdn_src_ip}|-)\"\|
+                  \"(?:%{IP:http_true_client_ip}|-)\"\|
+                  (?:%{USERNAME:PHPSESSID}|null)
+
+
+
+
+        (?:%{QS:http_x_forwarded_for}|-) \| %{IP:remote_addr} \| \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]\|\[%{IPORHOST:host}\]\|\"%{DATA:request_method} \| (?:%{DATA:http_referer}|-) \| %{DATA:server_protocol}\" \| %{NUMBER:status} \| (?:%{NUMBER:body_bytes_sent}|-)\|\"(?:%{DATA:http_referer}|-)\" \| \"%{DATA:http_user_agent}\" \| \"(?:%{NUMBER:upstream_cache_status}|-)\"\| \"(?:%{DATA:request_time}|-) \| (%{BASE16FLOAT:upstream_response_time}) \| (?:%{IP:upstream_addr}|-)\"\| \"(?:%{IP:http_cdn_src_ip}|-)\" \| \"(?:%{IPORHOST}:%{POSINT}|-)\" \|%{USERNAME:PHPSESSID}
+
+
+
+log_format main  '$http_x_forwarded_for |
+                   $remote_addr |
+                   - $remote_user [$time_local]' |
+                  '[$host]' |
+                  '"$request_method |
+                  $scheme://$host$request_uri |
+                  $server_protocol" |
+                  $status |
+                  $body_bytes_sent' |
+                  '"$http_referer" |
+                   "$http_user_agent" |
+                  "$upstream_cache_status"' |
+                  ' "$request_time |
+                  $upstream_response_time |
+                  $upstream_addr"' |
+                  ' "$http_cdn_src_ip" |
+                  "$http_true_client_ip"|
+                  "$PHPSESSID" ';
+
+
+                  - |
+                  192.168.0.30 |
+                  - - [19/Sep/2018:12:38:35 +0800]|
+                  [sit.crazysales.com.au]|
+                  "GET |
+                  https://sit.crazysales.com.au/ |
+                  HTTP/1.1" |
+                  200 |
+                  40643|
+                 "https://sit.crazysales.com.au/online-large-flat-roof-wooden-dog-house-kennel-131079.html" |
+                 "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0" |
+                 "-"|
+                 "0.057 |
+                  0.056 |
+                  127.0.0.1:9001"|
+                  "-" |
+                  "-" |
+                  "acagabekp3q12ufei4gucp2bve"
+
+
+
+
+- 192.168.0.30 - - [19/Sep/2018:12:32:57 +0800][sit.crazysales.com.au]"GET https://sit.crazysales.com.au/js/viewmodel/productDetailsViewModel.js?v=qfCi9MNg HTTP/1.1" 200 14433"https://sit.crazysales.com.au/online-large-flat-roof-wooden-dog-house-kennel-131079.html" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0" "-" "0.000 - -" "-" "-" ""
+- | 192.168.0.30 | - - [19/Sep/2018:12:38:35 +0800]|[sit.crazysales.com.au]|"GET | https://sit.crazysales.com.au/ | HTTP/1.1" | 200 | 40643|"https://sit.crazysales.com.au/online-large-flat-roof-wooden-dog-house-kennel-131079.html" | "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0" | "-"| "0.057 | 0.056 | 127.0.0.1:9001"| "-" | "-" |""
