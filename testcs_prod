@@ -60,7 +60,7 @@ log_format main  '$http_x_forwarded_for
 
 
 
-        (?:%{QS:http_x_forwarded_for}|-) \| %{IP:remote_addr} \| \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]\|\[%{IPORHOST:host}\]\|\"%{DATA:request_method} \| (?:%{DATA:http_referer}|-) \| %{DATA:server_protocol}\" \| %{NUMBER:status} \| (?:%{NUMBER:body_bytes_sent}|-)\|\"(?:%{DATA:http_referer}|-)\" \| \"%{DATA:http_user_agent}\" \| \"(?:%{NUMBER:upstream_cache_status}|-)\"\| \"(?:%{DATA:request_time}|-) \| (%{BASE16FLOAT:upstream_response_time}) \| (?:%{IP:upstream_addr}|-)\"\| \"(?:%{IP:http_cdn_src_ip}|-)\" \| \"(?:%{IPORHOST}:%{POSINT}|-)\" \|%{USERNAME:PHPSESSID}
+(?:%{QS:http_x_forwarded_for}|-) \| %{IP:remote_addr} \| \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]\|\[%{IPORHOST:host}\]\|\"%{DATA:request_method} \| (?:%{DATA:http_referer}|-) \| %{DATA:server_protocol}\" \| %{NUMBER:status} \| (?:%{NUMBER:body_bytes_sent}|-)\|\"(?:%{DATA:http_referer}|-)\" \| \"%{DATA:http_user_agent}\" \| \"(?:%{NUMBER:upstream_cache_status}|-)\"\| \"(?:%{DATA:request_time}|-) \| (%{BASE16FLOAT:upstream_response_time}) \| (?:%{IP:upstream_addr}|-)\"\| \"(?:%{IP:http_cdn_src_ip}|-)\" \| \"(?:%{IPORHOST}:%{POSINT}|-)\" \|%{USERNAME:PHPSESSID}
 
 
 
