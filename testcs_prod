@@ -44,18 +44,18 @@ log_format main  '$http_x_forwarded_for
                 \[%{IPORHOST:host}\]\|
                \"%{DATA:request_method}\|
                (?:%{DATA:http_referer}|-)\|
-                %{DATA:server_protocol}\"\|
+                %{DATA:server_protocol}\" \|
                 %{NUMBER:status}\|
                 (?:%{NUMBER:body_bytes_sent}|-)\|
-                \"(?:%{DATA:http_referer}|-)\"\|
-                 \"%{DATA:http_user_agent}\"\|
-                 \"(?:%{NUMBER:upstream_cache_status}|-)\"\|
-                 \"(?:%{DATA:request_time}|-)\|
+                \"(?:%{DATA:http_referer}|-)\" \|
+                 \"%{DATA:http_user_agent}\" \|
+                 \"(?:%{NUMBER:upstream_cache_status}|-)\" \|
+                 \"(?:%{DATA:request_time}|-) \|
                  (%{BASE16FLOAT:upstream_response_time}) \|
                  (?:%{IP:upstream_addr}|-)\"\|
                   \"(?:%{IP:http_cdn_src_ip}|-)\"\|
                   \"(?:%{IP:http_true_client_ip}|-)\"\|
-                  (?:%{USERNAME:PHPSESSID}|null)
+                  (?:%{USERNAME:PHPSESSID}|" ")
 
 
 
@@ -91,11 +91,11 @@ log_format main  '$http_x_forwarded_for |
                   "GET |
                   https://sit.crazysales.com.au/ |
                   HTTP/1.1" |
-                  200 |
+                  200" |
                   40643|
                  "https://sit.crazysales.com.au/online-large-flat-roof-wooden-dog-house-kennel-131079.html" |
                  "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0" |
-                 "-"|
+                 "-" |
                  "0.057 |
                   0.056 |
                   127.0.0.1:9001"|
