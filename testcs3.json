@@ -17,4 +17,4 @@
 \" (?:%{USERNAME:PHPSESSID}|" ")
 
 
-(?:%{IP:http_x_forwarded_for}|-) %{IP:remote_addr} \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]\[%{IPORHOST:host}\]\"%{DATA:request_method} (?:%{URI:http_referer}|-) %{DATA:server_protocol}\" %{NUMBER:status} (?:%{NUMBER:body_bytes_sent}|-)\"(?:%{DATA:http_referer}|-)\" \"%{DATA:http_user_agent}\" \"(?:%{NUMBER:upstream_cache_status}|-)\" \"(?:%{DATA:request_time}|-) (?:%{BASE16FLOAT:upstream_response_time}|-) (?:%{IPORHOST}:%{POSINT}|-)\" \"(?:%{IP:http_cdn_src_ip}|-)\" \"(?:%{IP:http_true_client_ip}|-)\" (?:%{USERNAME:PHPSESSID}|"")
+(?:%{IP:http_x_forwarded_for}|-) %{IP:remote_addr} \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]\[%{IPORHOST:host}\]\"%{DATA:request_method} (?:%{URI:http_referer}|-) %{DATA:server_protocol}\" %{NUMBER:status} (?:%{NUMBER:body_bytes_sent}|-)\"(?:%{DATA:http_referer}|-)\" \"%{DATA:http_user_agent}\" \"(?:%{NUMBER:upstream_cache_status}|-)\" \"(?:%{DATA:request_time}|-) (?:%{BASE16FLOAT:upstream_response_time}|-) (?:%{IPORHOST}:%{POSINT}|-)\" \"(?:%{IP:http_cdn_src_ip}|-)\" \"(?:%{IP:http_true_client_ip}|-)\" (?:%{DATA:PHPSESSID}|"")
