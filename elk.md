@@ -15,9 +15,10 @@ Kibana是Elasticsearch的数据可视化界面。 Kibana提供了一个漂亮的
 **前提条件**
 
 *   Ubuntu 16.04 64位服务器，内存为4GB，主机名为elk-master
-*   Ubuntu 16.04 64位客户端，1 GB RAM，主机名 - elk-client1
-*   CentOS 7 64位客户端，1GB RAM，主机名 - elk-client2
+*   Ubuntu 16.04 64位客户端，4GB RAM，主机名 - elk-slave
+*   CentOS 7 64位客户端，1GB RAM，主机名 - elk-client（生产机器）
 
+**elk在master安装，复制安装好的elk机器为slave，slave关闭其他服务,只开启elasticsearch 与master组成集群.**
 第1步 - 安装Java
 ------------
 
@@ -41,7 +42,7 @@ sudo apt-get install -y oracle-java8-installer
 ```bash
 java -version
 ```
-[![Ubuntu 16.04上的Java版本](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/1.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/1.png)
+![](http://wp.crazysales.com.au/wp-content/uploads/2018/11/668700f68af70e5666f58c431e564556.png)
 
 第2步 - 安装和配置弹性搜索
 ---------------
@@ -52,9 +53,9 @@ java -version
 ```bash
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 ```
-将弹性5.x存储库添加到'sources.list.d'目录。
+将弹性6.x存储库添加到'sources.list.d'目录。
 ```bash
-echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
 ```
 更新存储库并使用下面的apt命令安装Elasticsearch 5.1。
 ```bash
@@ -109,7 +110,7 @@ sudo systemctl start elasticsearch
 ```bash
 netstat -plntu
 ```
-[![在Ubuntu 16.04上安装Elasticsearch](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/2.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/2.png)
+![](http://wp.crazysales.com.au/wp-content/uploads/2018/11/771d1c6b47bc417d46e4204ad89f2454.png)
 
 然后检查内存锁以确保启用mlockall。 还要检查Elasticsearch是否正在运行以下命令。
 ```bash
@@ -118,7 +119,7 @@ curl -XGET 'localhost:9200/?pretty'
 ```
 您将看到以下结果。
 
-[![安装mlockall启用和弹性搜索](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/3.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/3.png)
+[![安装mlockall启用和弹性搜索](http://wp.crazysales.com.au/wp-content/uploads/2018/11/3.png)
 
 第3步 - 使用Nginx安装和配置Kibana
 ------------------------
@@ -150,8 +151,7 @@ Kibana将作为节点应用程序运行在端口5601上。
 ```bash
 netstat -plntu
 ```
-[![在Ubuntu 16.04上安装Kibana](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/4.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/4.png)
-
+![](http://wp.crazysales.com.au/wp-content/uploads/2018/11/9ce7fcf9689880d55b4d37881f1c8f67.png)
 Kibana安装完成，现在我们需要安装Nginx并将其配置为反向代理，以便能够从公共IP地址访问Kibana。
 
 接下来，安装Nginx和apache2-utils软件包。
@@ -202,7 +202,7 @@ nginx -t
 systemctl enable nginx  
 systemctl restart nginx
 ```
-[![在Ubuntu 16.04上安装了nginx的Kibana](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/5.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/5.png)
+[![在Ubuntu 16.04上安装了nginx的Kibana](http://wp.crazysales.com.au/wp-content/uploads/2018/11/5.png)
 
 第4步 - 安装和配置Logstash
 -------------------
@@ -298,7 +298,7 @@ output {
 sudo systemctl enable logstash  
 sudo systemctl start logstash
 ```
-[![在Ubuntu 16.04上安装和配置Logstash](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/6.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/6.png)
+[![在Ubuntu 16.04上安装和配置Logstash](http://wp.crazysales.com.au/wp-content/uploads/2018/11/6.png)
 
 第5步 - 在Ubuntu客户端上安装和配置Filebeat
 ------------------------------
@@ -331,8 +331,7 @@ sudo apt-get install -y apt-transport-https
 ```
 添加弹性存储库并更新所有Ubuntu存储库。
 ```bash
-echo "deb https://artifacts.elastic.co/packages/5.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-5.x.list  
-sudo apt-get update
+echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
 ```
 现在使用apt命令安装'filebeat'。
 ```bash
@@ -386,7 +385,7 @@ sudo systemctl enable filebeat
 ```bash
 sudo systemctl status filebeat
 ```
-[![在Ubuntu 16.04客户端上安装Filebeat](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/7.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/7.png)
+[![在Ubuntu 16.04客户端上安装Filebeat](http://wp.crazysales.com.au/wp-content/uploads/2018/11/7.png)
 
 第6步 - 在CentOS客户端上安装和配置文件
 ------------------------
@@ -487,7 +486,7 @@ sudo systemctl start filebeat
 ```
 tail -f /var/log/filebeat/filebeat
 ```
-[![在CentOS 7客户端服务器上安装Filebeat](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/8.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/8.png)
+[![在CentOS 7客户端服务器上安装Filebeat](http://wp.crazysales.com.au/wp-content/uploads/2018/11/8.png)
 
 第8步 - 测试
 --------
