@@ -57,7 +57,7 @@ wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add
 ```bash
 echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
 ```
-更新存储库并使用下面的apt命令安装Elasticsearch 5.1。
+更新存储库并使用下面的apt命令安装Elasticsearch 6.4。
 ```bash
 sudo apt-get update  
 sudo apt-get install -y elasticsearch
@@ -219,7 +219,7 @@ vim /etc/hosts
 ```
 添加服务器IP地址和主机名。
 ```
-10.0.15.10 elk-master
+10.20.0.142 cs-elk
 ```
 保存主机文件并退出编辑器。
 
@@ -317,7 +317,7 @@ vim /etc/hosts
 ```
 在文件末尾添加下面的配置。
 ```
-10.0.15.10 elk-master
+10.20.0.142 cs-elk
 ```
 保存并退出。
 
@@ -410,7 +410,7 @@ vim /etc/hosts
 ```
 添加麋鹿主服务器地址。
 ```bash
-10.0.15.10 elk-master
+10.20.0.142 cs-elk
 ```
 保存并退出。
 
@@ -425,9 +425,9 @@ vim elastic.repo
 ```
 粘贴以下配置。
 ```
-\[elastic-5.x\]  
-name=Elastic repository for 5.x packages  
-baseurl=https://artifacts.elastic.co/packages/5.x/yum  
+\[elastic-6.x\]  
+name=Elastic repository for 6.x packages  
+baseurl=https://artifacts.elastic.co/packages/6.x/yum  
 gpgcheck=1  
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch  
 enabled=1  
