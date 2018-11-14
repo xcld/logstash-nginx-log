@@ -67,9 +67,53 @@ sudo apt-get install -y elasticsearch
 cd /etc/elasticsearch/  
 vim elasticsearch.yml
 ```
+master elasticsearch.yml
+```
+cluster.name: cses
+node.name: es-node1
+node.master: true  # 意思是该节点为主节点
+node.data: false
+path:
+  logs: /var/log/elasticsearch
+  data: /var/lib/elasticsearch
+network.host: 10.20.0.142
+network.bind_host: 0.0.0.0
+network.publish_host: 10.20.0.142
+transport.tcp.port: 9300
+http.port: 9200
+#discovery.zen.ping.unicast.hosts: ["10.20.0.142","10.20.1.67","10.20.0.142:9300"]
+discovery.zen.ping.unicast.hosts:
+   - 10.20.1.67:9300
+   - 10.20.0.142 
+discovery.zen.minimum_master_nodes: 1
+bootstrap.memory_lock: false
+bootstrap.system_call_filter: false
+```
+
+slave elasticsearch.yml
+```
+cluster.name: cses
+node.name: es-node2
+node.master: false  # 意思是该节点为从节点
+path:
+  logs: /var/log/elasticsearch
+  data: /var/lib/elasticsearch
+network.host: 10.20.1.67
+network.bind_host: 0.0.0.0
+network.publish_host: 10.20.1.67
+transport.tcp.port: 9300
+http.port: 9200
+#discovery.zen.ping.unicast.hosts: ["10.20.0.142","10.20.1.67","10.20.0.142:9300"]
+discovery.zen.ping.unicast.hosts:
+   - 10.20.0.142:9300
+   - 10.20.1.67
+discovery.zen.minimum_master_nodes: 1
+bootstrap.memory_lock: false
+bootstrap.system_call_filter: false
+```
 通过删除第43行的注释，为Elasticsearch启用内存锁定。我们这样做可以禁用Elasticsearch的交换内存，以避免重载服务器。
 ```
-bootstrap.memory\_lock: true
+bootstrap.memory_lock: true
 ```
 在“网络”块中，取消注释network.host和http.port行。
 ```
@@ -94,7 +138,7 @@ vim /etc/default/elasticsearch
 ```
 取消注释第60行，并确保该值为“无限制”。
 ```
-MAX\_LOCKED\_MEMORY=unlimited
+MAX_LOCKED_MEMORY=unlimited
 ```
 保存并退出。
 
@@ -114,7 +158,7 @@ netstat -plntu
 
 然后检查内存锁以确保启用mlockall。 还要检查Elasticsearch是否正在运行以下命令。
 ```bash
-curl -XGET 'localhost:9200/\_nodes?filter\_path=\*\*.mlockall&pretty'  
+curl -XGET 'localhost:9200/_nodes?filter_path=\*\*.mlockall&pretty'  
 curl -XGET 'localhost:9200/?pretty'
 ```
 您将看到以下结果。
@@ -170,18 +214,18 @@ vim sites-available/kibana
 server {  
     listen 80;  
    
-    server\_name elk-stack.co;  
+    server_name elk-stack.co;  
    
-    auth\_basic "Restricted Access";  
-    auth\_basic\_user\_file /etc/nginx/.kibana-user;  
+    auth_basic "Restricted Access";  
+    auth_basic_user_file /etc/nginx/.kibana-user;  
    
     location / {  
-        proxy\_pass http://localhost:5601;  
-        proxy\_http\_version 1.1;  
-        proxy\_set\_header Upgrade $http\_upgrade;  
-        proxy\_set\_header Connection 'upgrade';  
-        proxy\_set\_header Host $host;  
-        proxy\_cache\_bypass $http\_upgrade;  
+        proxy_pass http://localhost:5601;  
+        proxy_http_version 1.1;  
+        proxy_set_header Upgrade $http_upgrade;  
+        proxy_set_header Connection 'upgrade';  
+        proxy_set_header Host $host;  
+        proxy_cache_bypass $http_upgrade;  
     }  
 }
 ```
@@ -246,8 +290,8 @@ input {
     port => 5443  
     type => syslog  
     ssl => true  
-    ssl\_certificate => "/etc/logstash/logstash.crt"  
-    ssl\_key => "/etc/logstash/logstash.key"  
+    ssl_certificate => "/etc/logstash/logstash.crt"  
+    ssl_key => "/etc/logstash/logstash.key"  
   }  
 }
 ```
@@ -260,14 +304,14 @@ vim conf.d/syslog-filter.conf
 粘贴以下配置。
 ```
 filter {  
-  if \[type\] == "syslog" {  
+  if [type] == "syslog" {  
     grok {  
-      match => { "message" => "%{SYSLOGTIMESTAMP:syslog\_timestamp} %{SYSLOGHOST:syslog\_hostname} %{DATA:syslog\_program}(?:\\\[%{POSINT:syslog\_pid}\\\])?: %{GREEDYDATA:syslog\_message}" }  
-      add\_field => \[ "received\_at", "%{@timestamp}" \]  
-      add\_field => \[ "received\_from", "%{host}" \]  
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\\[%{POSINT:syslog_pid}\\])?: %{GREEDYDATA:syslog_message}" }  
+      add_field => [ "received_at", "%{@timestamp}" ]  
+      add_field => [ "received_from", "%{host}" ]  
     }  
     date {  
-      match => \[ "syslog\_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" \]  
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]  
     }  
   }  
 }
@@ -283,11 +327,11 @@ vim conf.d/output-elasticsearch.conf
 粘贴以下配置。
 ```
 output {  
-  elasticsearch { hosts => \["localhost:9200"\]  
+  elasticsearch { hosts => ["localhost:9200"]  
     hosts => "localhost:9200"  
-    manage\_template => false  
-    index => "%{\[@metadata\]\[beat\]}-%{+YYYY.MM.dd}"  
-    document\_type => "%{\[@metadata\]\[type\]}"  
+    manage_template => false  
+    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"  
+    document_type => "%{[@metadata][type]}"  
   }  
 }
 ```
@@ -357,15 +401,15 @@ document-type: syslog
 #-------------------------- Elasticsearch output ------------------------------  
 #output.elasticsearch:  
   # Array of hosts to connect to.  
-\#  hosts: \["localhost:9200"\]
+\#  hosts: ["localhost:9200"]
 ```
 启用logstash输出，取消注释配置并更改值如下。
 ```
 output.logstash:  
   # The Logstash hosts  
-  hosts: \["elk-master:5443"\]  
-  bulk\_max\_size: 2048  
-  ssl.certificate\_authorities: \["/etc/filebeat/logstash.crt"\]  
+  hosts: ["elk-master:5443"]  
+  bulk_max_size: 2048  
+  ssl.certificate_authorities: ["/etc/filebeat/logstash.crt"]  
   template.name: "filebeat"  
   template.path: "filebeat.template.json"  
   template.overwrite: false
@@ -425,7 +469,7 @@ vim elastic.repo
 ```
 粘贴以下配置。
 ```
-\[elastic-6.x\]  
+[elastic-6.x]  
 name=Elastic repository for 6.x packages  
 baseurl=https://artifacts.elastic.co/packages/6.x/yum  
 gpgcheck=1  
@@ -462,15 +506,15 @@ document-type: syslog
 #-------------------------- Elasticsearch output ------------------------------  
 #output.elasticsearch:  
   # Array of hosts to connect to.  
-\#  hosts: \["localhost:9200"\]
+\#  hosts: ["localhost:9200"]
 ```
 现在添加新的logstash输出配置，取消注释logstash输出配置，并将所有值更改为下面配置中显示的值。
 ```
 output.logstash:  
   # The Logstash hosts  
-  hosts: \["elk-master:5443"\]  
-  bulk\_max\_size: 2048  
-  ssl.certificate\_authorities: \["/etc/filebeat/logstash.crt"\]  
+  hosts: ["elk-master:5443"]  
+  bulk_max_size: 2048  
+  ssl.certificate_authorities: ["/etc/filebeat/logstash.crt"]  
   template.name: "filebeat"  
   template.path: "filebeat.template.json"  
   template.overwrite: false
@@ -519,4 +563,3 @@ tail -f /var/log/filebeat/filebeat
 --
 
 [https://www.elastic.co/guide/index.html](https://www.elastic.co/guide/index.html)
-
