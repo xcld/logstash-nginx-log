@@ -1,14 +1,13 @@
-
 如何在Ubuntu 16.04上安装Elastic Stack弹性栈
 ----------------------------------
 
-在本教程中，我将向您展示如何在单个Ubuntu 16.04服务器上安装和配置Elastic Stack，用于监控服务器日志以及如何插入...
+在本教程中，我将向您展示如何在双个Ubuntu 16.04服务器上安装和配置Elastic Stack，用于监控服务器日志以及如何插入...
 
 **Elasticsearch**是基于Lucene开发的开源搜索引擎，由java开发。 它提供了一个分布式和多租户全文搜索引擎，其中包含HTTP Dashboard Web界面（Kibana）和JSON文档方案。 Elasticsearch是一个可扩展的搜索引擎，可用于搜索所有类型的文档，包括日志文件。 弹性搜索是“弹性”或ELK的核心。
 
 **Logstash**是一个用于管理系统事件和日志的开源工具。 它提供实时流水线来收集数据。 Logstash将收集日志或数据，将所有数据转换为JSON文档，并将其存储在Elasticsearch中。
 
-Kibana是Elasticsearch的数据可视化界面。 Kibana提供了一个漂亮的仪表板（Web界面），它允许您自己管理和可视化所有Elasticsearch的数据。 它不仅美丽，而且强大。
+**Kibana**是Elasticsearch的数据可视化界面。 Kibana提供了一个漂亮的仪表板（Web界面），它允许您自己管理和可视化所有Elasticsearch的数据。 它不仅美丽，而且强大。
 
 在本教程中，我将向您展示如何在单个Ubuntu 16.04服务器上安装和配置弹性，以监控服务器日志，以及如何使用Ubuntu 16.04和CentOS 7操作系统在客户端PC上安装“弹性Beats”。
 
@@ -42,7 +41,7 @@ sudo apt-get install -y oracle-java8-installer
 ```bash
 java -version
 ```
-![](http://wp.crazysales.com.au/wp-content/uploads/2018/11/668700f68af70e5666f58c431e564556.png)
+![](https://fwit.win/wp-content/uploads/2018/11/64d228dc93feada7ce352583efe9bf79.png)
 
 第2步 - 安装和配置弹性搜索
 ---------------
@@ -150,11 +149,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch  
 sudo systemctl start elasticsearch
 ```
-等待一秒弹簧搜索运行，然后检查服务器上的打开端口，确保端口9200的“状态”为“LISTEN”。
+等待一秒弹性搜索运行，然后检查服务器上的打开端口，确保端口9200的“状态”为“LISTEN”。
 ```bash
 netstat -plntu
 ```
-![](http://wp.crazysales.com.au/wp-content/uploads/2018/11/771d1c6b47bc417d46e4204ad89f2454.png)
+![](https://fwit.win/wp-content/uploads/2018/11/297d812b92226d0ee9a4a6551c53a8b7.png)
 
 然后检查内存锁以确保启用mlockall。 还要检查Elasticsearch是否正在运行以下命令。
 ```bash
@@ -163,8 +162,7 @@ curl -XGET 'localhost:9200/?pretty'
 ```
 您将看到以下结果。
 
-[![安装mlockall启用和弹性搜索](http://wp.crazysales.com.au/wp-content/uploads/2018/11/3.png)
-
+![](https://fwit.win/wp-content/uploads/2018/11/77ce12a48b24edbe1276ffad42d841c9.png)
 第3步 - 使用Nginx安装和配置Kibana
 ------------------------
 
@@ -195,7 +193,7 @@ Kibana将作为节点应用程序运行在端口5601上。
 ```bash
 netstat -plntu
 ```
-![](http://wp.crazysales.com.au/wp-content/uploads/2018/11/9ce7fcf9689880d55b4d37881f1c8f67.png)
+![](https://fwit.win/wp-content/uploads/2018/11/2e06a8e4a5f3c379592c2896f827c0a3.png)
 Kibana安装完成，现在我们需要安装Nginx并将其配置为反向代理，以便能够从公共IP地址访问Kibana。
 
 接下来，安装Nginx和apache2-utils软件包。
@@ -246,12 +244,11 @@ nginx -t
 systemctl enable nginx  
 systemctl restart nginx
 ```
-[![在Ubuntu 16.04上安装了nginx的Kibana](http://wp.crazysales.com.au/wp-content/uploads/2018/11/5.png)
-
+![](https://fwit.win/wp-content/uploads/2018/11/2fafea2339b70f5673a8ce0bd70d71da.png)
 第4步 - 安装和配置Logstash
 -------------------
 
-在此步骤中，我们将安装和配置Logsatash以将来自客户端的服务器日志与文件捕获集中在一起，然后过滤和转换所有数据（Syslog）并将其传输到存储（Elasticsearch）。
+在此步骤中，我们将安装和配置Logsatash以将来自客户端的服务器日志与文件捕获集中在一起，然后过滤和转换所有数据（Syslog日志或其他）并将其传输到存储（Elasticsearch）。
 
 使用apt命令安装Logstash 5。
 ```bash
@@ -283,42 +280,153 @@ openssl req -subj /CN=elk-master -x509 -days 3650 -batch -nodes -newkey rsa:4096
 cd /etc/logstash/  
 vim conf.d/filebeat-input.conf
 ```
-输入配置，粘贴配置如下。
+输入配置，粘贴配置如下，一个站点日志用一个专用端口收集。
 ```
-input {  
-  beats {  
-    port => 5443  
-    type => syslog  
-    ssl => true  
-    ssl_certificate => "/etc/logstash/logstash.crt"  
-    ssl_key => "/etc/logstash/logstash.key"  
-  }  
+input {
+  beats {
+    port => 5044
+    type => cslog
+   # ssl => true
+   # ssl_certificate => "/etc/logstash/logstash.crt"
+   # ssl_key => "/etc/logstash/logstash.key"
+  }
+  beats {
+    port => 5045
+    type => bestdealslog
+   # ssl => true
+   # ssl_certificate => "/etc/logstash/logstash.crt"
+   # ssl_key => "/etc/logstash/logstash.key"
+  }
+  beats {
+    port => 5046
+    type => clatteranslog
+   # ssl => true
+   # ssl_certificate => "/etc/logstash/logstash.crt"
+   # ssl_key => "/etc/logstash/logstash.key"
+  }
+  beats {
+    port => 5047
+    type => nighsleelog
+   # ssl => true
+   # ssl_certificate => "/etc/logstash/logstash.crt"
+   # ssl_key => "/etc/logstash/logstash.key"
+  }
 }
 ```
 保存并退出。
 
-创建syslog-filter.conf文件。
+创建log-filter.conf文件。
 ```bash
-vim conf.d/syslog-filter.conf
+vim conf.d/log-filter.conf
 ```
-粘贴以下配置。
+粘贴以下配置，用tags标签为条件判断日志类型，启用不同的grok过滤规则。
 ```
-filter {  
-  if [type] == "syslog" {  
-    grok {  
-      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\\[%{POSINT:syslog_pid}\\])?: %{GREEDYDATA:syslog_message}" }  
-      add_field => [ "received_at", "%{@timestamp}" ]  
-      add_field => [ "received_from", "%{host}" ]  
-    }  
-    date {  
-      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]  
-    }  
-  }  
+filter {
+    if "nginx-access-bestdeals" in [tags] or "nginx-access-cs" in [tags] {
+        grok {
+                patterns_dir => ["/etc/logstash/patterns/csnginx"]
+                match => { "message" => "%{CSNGINXACCESS} \"%{PHPSESSID:PHPSESSID}\""}
+                overwrite => ["message"]
+        }
+        mutate {
+                convert => ["status","integer"]
+                convert => ["body_bytes_sent","integer"]
+                convert => ["request_time","float"]
+        }
+        geoip {
+                source=>"remote_addr"
+                fields => ["city_name","country_name","ip","latitude","longitude","location","region_name","timezone"]
+                remove_field => ["[geoip][latitude]","[geoip][longitude]"]
+        }
+        date {
+                match => [ "timestamp","dd/MMM/YYYY:HH:mm:ss Z"]
+        }
+        useragent {
+                source=>"http_user_agent"
+        }
+} else if "nginx-access-clatterans" in [tags] or "nginx-access-nighslee" in [tags]  {
+        grok {  
+                patterns_dir => ["/etc/logstash/patterns/csnginx"]
+                match => { "message" => "%{CSNGINXACCESS}"}
+                overwrite => ["message"]
+        }
+        mutate {
+                convert => ["status","integer"]
+                convert => ["body_bytes_sent","integer"]
+                convert => ["request_time","float"]
+        }
+        geoip { 
+                source=>"remote_addr"
+                fields => ["city_name","country_name","ip","latitude","longitude","location","region_name","timezone"]
+                remove_field => ["[geoip][latitude]","[geoip][longitude]"]
+        }
+        date {  
+                match => [ "timestamp","dd/MMM/YYYY:HH:mm:ss Z"]
+        }
+        useragent {
+                source=>"http_user_agent"
+        }
+} else if "nginx-error-bestdeals" in [tags] or "nginx-error-cs" in [tags] or "nginx-error-clatterans" in [tags] or "nginx-error-nighslee" in [tags] {
+    grok {
+                patterns_dir => ["/etc/logstash/patterns/csnginx"]
+                match => { "message" => "%{CSNGINXERROR}"}
+                overwrite => ["message"]
+        }      
+
+} else if "app-error-bestdeals" in [tags] or "app-error-cs" in [tags] or "app-error-clatterans" in [tags] { 
+    grok {
+                patterns_dir => ["/etc/logstash/patterns/csnginx"]
+                match => { "message" => "%{CSAPPERROR}"}
+                overwrite => ["message"]
+        }
+
+} else if "php-fpm-bestdeals" in [tags] or "php-fpm-cs" in [tags] or "php-fpm-clatterans" in [tags] or  "php-fpm-nighslee" in [tags] {
+    grok {
+                patterns_dir => ["/etc/logstash/patterns/csnginx"]
+                match => { "message" => "%{CSPHPFPM}"}
+                overwrite => ["message"]
+        }
+
+}
+
+     if "sys-messages"  in [tags] {
+        grok {         
+                        match => { "message" => "%{SYSLOGLINE}" }
+                        add_field => [ "received_at", "%{@timestamp}" ]
+                        add_field => [ "received_from", "%{host}" ]
+        }
+        date {  
+                match => [ "timestamp", "MMM  d HH:mm:ss" ]
+        }
+        #ruby {
+        #        code => "event['@timestamp'] = event['@timestamp'].getlocal"
+        #}
+}
 }
 ```
-我们使用名为“ **grok** ”的过滤器插件来解析syslog文件。
+我们使用名为“ **grok** ”的过滤器插件来解析log文件。
 
 保存并退出。
+创建csnginx自定义grok正则表达式文件
+vim /etc/logstash/patterns/csnginx
+```
+USERNAME [a-zA-Z\.\@\-\+_%]+
+PHPSESSID %{DATA}
+NGUSER %{NGUSERNAME}
+NGINXACCESS %{IPORHOST:clientip} - %{NOTSPACE:remote_user} \[%{HTTPDATE:timestamp}\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} \"%{IPV4:http_x_forwarded_for}\"
+CSNGINXACCESS (?:%{IP:http_x_forwarded_for}|-) %{IP:remote_addr} \- (?:%{NOTSPACE:remote_user}|-) \[%{HTTPDATE:timestamp}\]\[%{IPORHOST:host}\]\"%{DATA:request_method} (?:%{URI:http_referer}|-) %{DATA:server_protocol}\" %{NUMBER:status} (?:%{NUMBER:body_bytes_sent}|-)\"(?:%{DATA:http_referer}|-)\" \"%{DATA:http_user_agent}\" \"(?:%{NUMBER:upstream_cache_status}|-)\" \"(?:%{BASE16FLOAT:request_time}|-) (?:%{BASE16FLOAT:upstream_response_time}|-) (?:%{IPORHOST}:%{POSINT}%|%{DATA:upstream}|-)\" \"(?:%{IP:http_cdn_src_ip}|-)\" \"(?:%{IP:http_true_client_ip}|-)\"
+#CSNGINXERROR (?<timestamp>%{YEAR}[./]%{MONTHNUM}[./]%{MONTHDAY} %{TIME}) \[%{LOGLEVEL:severity}\] %{POSINT:pid}#%{NUMBER:threadid}\: \*%{NUMBER:connectionid} %{GREEDYDATA:errormessage}, client: %{IP:client}, server: %{GREEDYDATA:server}, request: "(?<httprequest>%{WORD:httpcommand} %{UNIXPATH:httpfile} HTTP/(?<httpversion>[0-9.]*))"(, )?(upstream: "(?<upstream>[^,]*)")?(, )?(host: "(?<host>[^,]*)")?
+CSNGINXERROR (?<timestamp>\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[%{DATA:err_severity}\] (%{NUMBER:pid:int}#%{NUMBER}: \*%{NUMBER}|\*%{NUMBER}) %{DATA:err_message}(?:, client: (?<clientip>%{IP}|%{HOSTNAME}))(?:, server: %{IPORHOST:server})(?:, request: "%{WORD:verb} %{URIPATHPARAM:request} HTTP/%{NUMBER:httpversion}")?(?:, upstream: "%{DATA:upstream}")?(?:, host: "%{IPORHOST:host}")?(?:, referrer: "%{URI:referrer}”)?
+CSAPPERROR %{TIMESTAMP_ISO8601:timestamp} %{DATA:err_severity}\:(?: Message: %{DATA:Message})(?: {main})
+MYTIME %{MONTHDAY}[./-]%{MONTH}[./-]%{YEAR} %{TIME}
+CSPHPFPM \[%{MYTIME:timestamp}\]\s+%{LOGLEVEL:severity}:\s+%{GREEDYDATA:errormessage}
+CSPHPERROR \[%{MYTIME:timestamp}\s+%{DATA:zone}\]\s+PHP\s+%{LOGLEVEL:severity}:\s+%{GREEDYDATA:errormessage}
+CSPHPSLOW \[%{MYTIME:time_local}\]  \[pool %{SSL:pool}\] pid %{SSL:pid}\n%{SS:content}
+SSL %{USERNAME}
+SS ([a-zA-Z0-9._-]|\s|\[|\]|\=|\/|\(|\)|\:)+
+```
+具体过滤调试可以使用kibana自带的Grok Debugger调试工具，或者[Grok Debugger](http://grokdebug.herokuapp.com/)(自带梯子)
+![](https://fwit.win/wp-content/uploads/2018/11/12a48ef6d780833a8ffa3a849a8c47b9.png)
 
 创建输出配置文件'output-elasticsearch.conf'。
 
@@ -326,13 +434,12 @@ vim conf.d/output-elasticsearch.conf
 
 粘贴以下配置。
 ```
-output {  
-  elasticsearch { hosts => ["localhost:9200"]  
-    hosts => "localhost:9200"  
-    manage_template => false  
-    index => "%{[@metadata][beat]}-%{+YYYY.MM.dd}"  
-    document_type => "%{[@metadata][type]}"  
-  }  
+output {
+    elasticsearch {
+      hosts => ["localhost:9200"]
+      index => "logstash-%{tags[0]}-%{+YYYY.MM.dd}"
+    }
+    stdout { codec => rubydebug }
 }
 ```
 保存并退出。
@@ -342,7 +449,7 @@ output {
 sudo systemctl enable logstash  
 sudo systemctl start logstash
 ```
-[![在Ubuntu 16.04上安装和配置Logstash](http://wp.crazysales.com.au/wp-content/uploads/2018/11/6.png)
+![](https://fwit.win/wp-content/uploads/2018/11/7e405f54893a59924a0565e804cf7bb4.png)
 
 第5步 - 在Ubuntu客户端上安装和配置Filebeat
 ------------------------------
@@ -388,33 +495,48 @@ vim filebeat.yml
 ```
 在路径配置下添加新的日志文件。
 ```
-  paths:  
-    - /var/log/auth.log  
-    - /var/log/syslog
-```
-将文档类型设置为“syslog”。
-```
-document-type: syslog
-```
-通过向行添加注释来禁用弹性搜索输出。
-```
-#-------------------------- Elasticsearch output ------------------------------  
-#output.elasticsearch:  
-  # Array of hosts to connect to.  
-\#  hosts: ["localhost:9200"]
-```
-启用logstash输出，取消注释配置并更改值如下。
-```
-output.logstash:  
-  # The Logstash hosts  
-  hosts: ["elk-master:5443"]  
-  bulk_max_size: 2048  
-  ssl.certificate_authorities: ["/etc/filebeat/logstash.crt"]  
-  template.name: "filebeat"  
-  template.path: "filebeat.template.json"  
-  template.overwrite: false
+filebeat.prospectors:
+- input_type: log
+  enabled: true
+  paths:
+    - /home/crazysal/logs/nginx/crazysales.access.log
+  tags: ["nginx-access-cs"]
+- input_type: log
+  enabled: true
+  multiline.pattern: '^(\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})'
+  multiline.negate: true
+  multiline.match: after
+  paths:
+    - /home/crazysal/logs/nginx/error.log
+  tags: ["nginx-error-cs"]
+- input_type: log
+  enabled: true
+  paths:
+    - /var/log/php7.1-fpm.log
+  tags: ["php-fpm-cs"]
+- input_type: log
+  enabled: true
+  multiline.pattern: '^(\d{4}-\d{2}-\d{2}[T]\d{2}:\d{2}:\d{2}\+\d{2}:\d{2})'
+  multiline.negate: true
+  multiline.match: after
+  paths:
+    - /home/crazysal/crazysales_4/log/errorlog-*.txt
+  tags: ["app-error-cs"]
+- input_type: log
+  paths:
+    - /var/log/messages
+  tags: ["sys-messages"]
+
+
+output.logstash:
+     # The Logstash hosts
+  hosts: ["cs-elk:5044"]
+ # ssl.certificate_authorities: ["/etc/filebeat/logstash.crt"]
+ # ssl.certificate: "/etc/filebeat/logstash.crt"
+ # ssl.key: "/etc/filebeat/logstash.key" 
 ```
 保存并退出。
+更详细的配置细节参考[官方文档](https://www.elastic.co/guide/en/beats/filebeat/current/configuring-howto-filebeat.html)
 
 将证书文件移动到filebeat目录。
 ```bash
@@ -429,9 +551,8 @@ sudo systemctl enable filebeat
 ```bash
 sudo systemctl status filebeat
 ```
-[![在Ubuntu 16.04客户端上安装Filebeat](http://wp.crazysales.com.au/wp-content/uploads/2018/11/7.png)
-
-第6步 - 在CentOS客户端上安装和配置文件
+![](https://fwit.win/wp-content/uploads/2018/11/4307b6340c34057b7397bc2656b80b70.png)
+第6步 - 在CentOS客户端上安装和配置文件(参考[官方安装方法](https://www.elastic.co/guide/en/beats/filebeat/current/setup-repositories.html))
 ------------------------
 
 Beats是数据shippers，可以安装在客户端节点上的轻量级代理，将大量数据从客户机发送到Logstash或Elasticsearch服务器。 有4个Beats，“Log Files”为“Filebeat”，“Metrics”为“Metricbeat”，Windows客户端“Event Log”为“Network Data”的“Packetbeat”和“Winlogbeat”。
@@ -452,7 +573,7 @@ TYPE elk-server password
 ```bash
 vim /etc/hosts
 ```
-添加麋鹿主服务器地址。
+添加master主服务器地址。
 ```bash
 10.20.0.142 cs-elk
 ```
@@ -489,72 +610,30 @@ Filebeat已安装，现在转到配置目录并编辑文件'filebeat.yml'。
 cd /etc/filebeat/  
 vim filebeat.yml
 ```
-在路径第21行，添加一些新的日志文件，我们将在这里添加两个文件：ssh的'/ var / log / secure'和服务器日志的'/ var / log / messages'。
 ```
-  paths:  
-    - /var/log/secure  
-    - /var/log/messages
+配置参考上面ubuntu客户端
 ```
-在第26行添加一个新配置，将文件类型定义为“syslog”。
-```
-document-type: syslog
-```
-默认情况下，filebeat使用弹性搜索作为输出。 在本教程中，我们将其更改为logshtash。 通过向行83和85添加注释来禁用弹性搜索输出。
-
-禁用弹性搜索输出。
-```
-#-------------------------- Elasticsearch output ------------------------------  
-#output.elasticsearch:  
-  # Array of hosts to connect to.  
-\#  hosts: ["localhost:9200"]
-```
-现在添加新的logstash输出配置，取消注释logstash输出配置，并将所有值更改为下面配置中显示的值。
-```
-output.logstash:  
-  # The Logstash hosts  
-  hosts: ["elk-master:5443"]  
-  bulk_max_size: 2048  
-  ssl.certificate_authorities: ["/etc/filebeat/logstash.crt"]  
-  template.name: "filebeat"  
-  template.path: "filebeat.template.json"  
-  template.overwrite: false
-```
-保存并退出。
-
-添加文件开始启动时启动它。
-```
-sudo systemctl enable filebeat  
-sudo systemctl start filebeat
-```
-现在，您可以检查并查看文件捕获日志文件以确保它正确运行。
 ```
 tail -f /var/log/filebeat/filebeat
 ```
-[![在CentOS 7客户端服务器上安装Filebeat](http://wp.crazysales.com.au/wp-content/uploads/2018/11/8.png)
-
+![](https://fwit.win/wp-content/uploads/2018/11/46e9a757e3c8dfbad467e665bc4de4b8.png)
 第8步 - 测试
 --------
 
 打开您的网络浏览器，并访问您在nginx配置中配置的弹性域，我的是'elk-stack.co'，用您的密码输入管理员用户名，然后按Enter键登录Kibana仪表板。
-
-[![登录到弹性kibana仪表板](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/9.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/9.png)
-
-创建一个新的默认索引' **filebeat- \*** '并点击' **创建** '。
-
-[![在Kibana仪表板上创建第一个索引文件](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/10.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/10.png)
-
+![](https://fwit.win/wp-content/uploads/2018/11/8924885cfc6d138d8458842973b0bb11.png)
+创建一个新的默认索引' **filebeat- \**或者 **logstash-\***(本示例是这个，具体看output配置输出格式) '并点击' **创建** '。
+![](https://fwit.win/wp-content/uploads/2018/11/b904e7e0671481480da01dcab9083848.png)
 默认索引已创建。 如果弹性堆叠上有多个Beats，您可以通过点击“ **星形** ”按钮来配置默认Beats。
 
-[![Filebeat索引创建为默认索引](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/11.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/11.png)
+![](https://fwit.win/wp-content/uploads/2018/11/650b0c229f154485117dd2846a42f324.png)
 
 转到“ **发现** ”，您将看到elk-client1和elk-client2服务器上的所有日志文件。
+![](https://fwit.win/wp-content/uploads/2018/11/ee4e2f16c2b452e7429c736c06002399.png)
 
-[![从elk-client1和elk-client2服务器发现所有日志](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/12.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/12.png)
+来自生产服务器日志的http 500状态码输出示例。
 
-来自elk-client1服务器日志的无效ssh登录的JSON输出示例。
-
-[![用于ssh的示例日志文件在elk-client1服务器上登录失败](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/13.png)](https://www.howtoing.com/wp-content/uploads/images/how-to-install-elastic-stack-on-ubuntu-16-04/big/13.png)
-
+![](https://fwit.win/wp-content/uploads/2018/11/b1f55f0c556a7397571f248f89ced190.png)
 还有更多的你可以使用Kibana仪表板，只是试试看！
 
 弹性已安装在Ubuntu 16.04服务器上，文件包已安装在Ubuntu和CentOS客户端服务器上。
