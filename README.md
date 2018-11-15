@@ -163,6 +163,7 @@ curl -XGET 'localhost:9200/?pretty'
 您将看到以下结果。
 
 ![](https://fwit.win/wp-content/uploads/2018/11/77ce12a48b24edbe1276ffad42d841c9.png)
+
 第3步 - 使用Nginx安装和配置Kibana
 ------------------------
 
