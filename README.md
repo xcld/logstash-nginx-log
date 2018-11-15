@@ -246,6 +246,7 @@ systemctl enable nginx
 systemctl restart nginx
 ```
 ![](https://fwit.win/wp-content/uploads/2018/11/2fafea2339b70f5673a8ce0bd70d71da.png)
+
 第4步 - 安装和配置Logstash
 -------------------
 
@@ -553,6 +554,7 @@ sudo systemctl enable filebeat
 sudo systemctl status filebeat
 ```
 ![](https://fwit.win/wp-content/uploads/2018/11/4307b6340c34057b7397bc2656b80b70.png)
+
 第6步 - 在CentOS客户端上安装和配置文件(参考[官方安装方法](https://www.elastic.co/guide/en/beats/filebeat/current/setup-repositories.html))
 ------------------------
 
@@ -618,6 +620,7 @@ vim filebeat.yml
 tail -f /var/log/filebeat/filebeat
 ```
 ![](https://fwit.win/wp-content/uploads/2018/11/46e9a757e3c8dfbad467e665bc4de4b8.png)
+
 第8步 - 测试
 --------
 
