@@ -411,6 +411,7 @@ filter {
 
 保存并退出。
 创建csnginx自定义grok正则表达式文件，具体参考[Grok正则表达式](https://github.com/logstash-plugins/logstash-patterns-core/tree/master/patterns)
+
 vim /etc/logstash/patterns/csnginx
 ```
 USERNAME [a-zA-Z\.\@\-\+_%]+
