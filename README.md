@@ -18,6 +18,7 @@
 *   CentOS 7 64位客户端，1GB RAM，主机名 - elk-client（生产机器）
 
 **elk在master安装，复制安装好的elk机器为slave，slave关闭其他服务,只开启elasticsearch 与master组成集群.**
+
 第1步 - 安装Java
 ------------
 
@@ -426,6 +427,16 @@ CSPHPERROR \[%{MYTIME:timestamp}\s+%{DATA:zone}\]\s+PHP\s+%{LOGLEVEL:severity}:\
 CSPHPSLOW \[%{MYTIME:time_local}\]  \[pool %{SSL:pool}\] pid %{SSL:pid}\n%{SS:content}
 SSL %{USERNAME}
 SS ([a-zA-Z0-9._-]|\s|\[|\]|\=|\/|\(|\)|\:)+
+```
+nginx日志格式
+```
+log_format main  '$http_x_forwarded_for $remote_addr - $remote_user [$time_local]'
+                      '[$host]'
+                      '"$request_method $scheme://$host$request_uri $server_protocol" $status $body_bytes_sent'
+                      '"$http_referer" "$http_user_agent" "$upstream_cache_status"'
+                      ' "$request_time $upstream_response_time $upstream_addr"'
+                      ' "$http_cdn_src_ip" "$http_true_client_ip" "$PHPSESSID" ';
+
 ```
 具体过滤调试可以使用kibana自带的Grok Debugger调试工具，或者[Grok Debugger](http://grokdebug.herokuapp.com/)(自带梯子)
 ![](https://fwit.win/wp-content/uploads/2018/11/12a48ef6d780833a8ffa3a849a8c47b9.png)
